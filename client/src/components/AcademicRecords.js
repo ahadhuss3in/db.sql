@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./styles/academicrecords.css"
 
 const AcademicRecords = () => {
   const [formData, setFormData] = useState({
@@ -44,7 +45,8 @@ const AcademicRecords = () => {
   };
 
   return (
-    <div>
+    
+    <div className="academic-records-container">
       <form onSubmit={handleSubmit}>
         <input
           type="text"

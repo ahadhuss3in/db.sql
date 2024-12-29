@@ -1,0 +1,123 @@
+/* Scoped styles using a unique parent class to avoid conflicts */
+body .academic-records-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background: linear-gradient(145deg, #ffffff 0%, #eef2ff 50%, #e0e7ff 100%);
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(71, 87, 193, 0.12);
+    border: 1px solid rgba(235, 238, 251, 0.9);
+    font-family: Arial, sans-serif;
+  }
+  
+  body .academic-records-container form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  body .academic-records-container form input {
+    padding: 12px 16px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: all 0.3s ease;
+    outline: none;
+    background: linear-gradient(to right, #ffffff 0%, #fafbff 100%);
+  }
+  
+  body .academic-records-container form input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+  }
+  
+  body .academic-records-container form input::placeholder {
+    color: #a0aec0;
+  }
+  
+  body .academic-records-container form button {
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+  }
+  
+  body .academic-records-container form button:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+  }
+  
+  body .academic-records-container form button:active {
+    transform: scale(0.98) translateY(0);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+  }
+  
+  body .academic-records-container button {
+    background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #4f46e5 100%);
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.25);
+    margin-top: 20px;
+  }
+  
+  body .academic-records-container button:hover {
+    background: linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(99, 102, 241, 0.3);
+  }
+  
+  body .academic-records-container button:active {
+    transform: scale(0.98) translateY(0);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+  }
+  
+  body .academic-records-container ul {
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  body .academic-records-container ul li {
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    background: #f7fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 16px;
+  }
+  
+  body .academic-records-container ul li:nth-child(odd) {
+    background: #edf2f7;
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 600px) {
+    body .academic-records-container {
+      margin: 20px;
+      padding: 15px;
+    }
+  
+    body .academic-records-container form input,
+    body .academic-records-container form button {
+      padding: 10px 14px;
+      font-size: 14px;
+    }
+  }
+  

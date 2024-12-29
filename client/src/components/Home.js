@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./styles/home.css"
 
 const Home = () => {
   const [formData, setFormData] = useState({
