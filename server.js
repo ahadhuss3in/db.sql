@@ -32,8 +32,17 @@ app.post("/students", async (req, res) => {
 });
 
 app.get("/students", async (req, res) => {
+  const { search } = req.query;
   try {
-    const result = await pool.query("SELECT * FROM students");
+    let query = "SELECT * FROM students";
+    let params = [];
+
+    if (search) {
+      query += " WHERE name ILIKE $1 OR id::text ILIKE $1";
+      params.push(`%${search}%`);
+    }
+
+    const result = await pool.query(query, params);
     res.json(result.rows); // Return the list of students
   } catch (err) {
     res.status(500).json(err.message);
@@ -64,7 +73,6 @@ app.delete('/students/:id', async (req, res) => {
 app.get("/student-details/:id", async (req, res) => {
   const { id } = req.params;
   try {
-    // Fetch student data from the `students` table
     const studentResult = await pool.query("SELECT * FROM students WHERE id = $1", [id]);
     if (studentResult.rows.length === 0) {
       return res.status(404).json({ message: 'Student not found' });
@@ -72,21 +80,18 @@ app.get("/student-details/:id", async (req, res) => {
 
     const student = studentResult.rows[0];
 
-    // Fetch related information for the student
     const studentInfoResult = await pool.query("SELECT * FROM student_info WHERE student_id = $1", [id]);
     const guardianResult = await pool.query("SELECT * FROM guardians WHERE student_id = $1", [id]);
     const libraryResult = await pool.query("SELECT * FROM library_records WHERE student_id = $1", [id]);
     const academicResult = await pool.query("SELECT * FROM academic_records WHERE student_id = $1", [id]);
     const attendanceResult = await pool.query("SELECT * FROM attendance WHERE student_id = $1", [id]);
 
-    // Collect all related data
     const studentInfo = studentInfoResult.rows.length > 0 ? studentInfoResult.rows[0] : null;
     const guardians = guardianResult.rows;
     const libraryRecords = libraryResult.rows;
     const academicRecords = academicResult.rows;
     const attendanceRecords = attendanceResult.rows;
 
-    // Return all the related data
     res.json({
       student,
       studentInfo,
@@ -105,27 +110,24 @@ app.get("/student-details/:id", async (req, res) => {
 // Attendance
 app.post("/attendance", async (req, res) => {
   const { student_id, status } = req.body;
-  const currentDate = new Date().toISOString().split("T")[0]; // Get current date in YYYY-MM-DD format
+  const currentDate = new Date().toISOString().split("T")[0];
 
   try {
-    // Check if attendance for this student already exists for today
     const result = await pool.query(
       "SELECT * FROM attendance WHERE student_id = $1 AND date = $2",
       [student_id, currentDate]
     );
 
     if (result.rows.length > 0) {
-      // If attendance already exists for today, send an error message
       return res.status(400).json({ message: "Attendance for today is already marked." });
     }
 
-    // Insert new attendance record
     const insertResult = await pool.query(
       "INSERT INTO attendance (student_id, status, date) VALUES ($1, $2, $3) RETURNING *",
       [student_id, status, currentDate]
     );
 
-    res.json(insertResult.rows[0]); // Send back the inserted attendance record
+    res.json(insertResult.rows[0]);
   } catch (err) {
     console.error("Error marking attendance:", err);
     res.status(500).json(err.message);
@@ -203,13 +205,38 @@ app.get("/student-info/:id", async (req, res) => {
 app.post("/library-records", async (req, res) => {
   const { student_id, book_name, issue_date, due_date } = req.body;
   try {
+    // Start a transaction
+    await pool.query("BEGIN");
+
+    // Insert the new library record
     const result = await pool.query(
       "INSERT INTO library_records (student_id, book_name, issue_date, due_date) VALUES ($1, $2, $3, $4) RETURNING *",
       [student_id, book_name, issue_date, due_date]
     );
-    res.json(result.rows[0]);
+
+    // Increase the student's fees by 30
+    const feeUpdateResult = await pool.query(
+      "UPDATE student_info SET fees = COALESCE(fees, 0) + 30 WHERE student_id = $1 RETURNING fees",
+      [student_id]
+    );
+
+    if (feeUpdateResult.rowCount === 0) {
+      throw new Error("Failed to update fees. Student record not found.");
+    }
+
+    // Commit the transaction
+    await pool.query("COMMIT");
+
+    // Return the updated library record and the new fees
+    res.json({
+      libraryRecord: result.rows[0],
+      updatedFees: feeUpdateResult.rows[0].fees,
+    });
   } catch (err) {
-    res.status(500).json(err.message);
+    // Rollback the transaction in case of error
+    await pool.query("ROLLBACK");
+    console.error("Error adding library record and updating fees:", err.message);
+    res.status(500).json({ message: "Failed to add library record and update fees", error: err.message });
   }
 });
 
@@ -227,41 +254,21 @@ app.get("/library-records/:id", async (req, res) => {
 });
 
 // DELETE route to remove a specific library record by student_id and book_name
-// Delete a student and their related records
-app.delete('/students/:id', async (req, res) => {
-  const studentId = req.params.id;  // Ensure you're using 'id' from the URL
-  console.log(`Attempting to delete student with ID: ${studentId}`);
-
+app.delete("/library-records/:student_id/:book_name", async (req, res) => {
+  const { student_id, book_name } = req.params;
   try {
-    // Start a transaction to ensure that if one delete fails, others don't run
-    await pool.query('BEGIN');
-
-    // Delete related records first to maintain referential integrity
-    await pool.query('DELETE FROM attendance WHERE student_id = $1', [studentId]);
-    await pool.query('DELETE FROM academic_records WHERE student_id = $1', [studentId]);
-    await pool.query('DELETE FROM student_info WHERE student_id = $1', [studentId]);
-    await pool.query('DELETE FROM library_records WHERE student_id = $1', [studentId]);
-    await pool.query('DELETE FROM guardians WHERE student_id = $1', [studentId]);
-
-    // Now, delete the student
-    const result = await pool.query('DELETE FROM students WHERE id = $1', [studentId]);
-
+    const result = await pool.query(
+      "DELETE FROM library_records WHERE student_id = $1 AND book_name = $2 RETURNING *",
+      [student_id, book_name]
+    );
     if (result.rowCount === 0) {
-      await pool.query('ROLLBACK');
-      console.log(`Student with ID: ${studentId} not found.`);
-      return res.status(404).send('Student not found');
+      return res.status(404).json({ message: "Library record not found" });
     }
-
-    await pool.query('COMMIT');
-    console.log(`Student with ID: ${studentId} and related records deleted successfully.`);
-    res.status(200).send({ message: 'Student and related records deleted successfully' });
-  } catch (error) {
-    await pool.query('ROLLBACK');
-    console.error('Error deleting student and related records:', error);
-    res.status(500).send('Server error');
+    res.json({ message: "Library record deleted successfully" });
+  } catch (err) {
+    res.status(500).json(err.message);
   }
 });
-
 
 // Guardians
 app.post("/guardians", async (req, res) => {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import "./styles/view.css";
 
 const ViewStudents = () => {
   const [students, setStudents] = useState([]);
@@ -8,6 +9,7 @@ const ViewStudents = () => {
   const [showAcademic, setShowAcademic] = useState(false);
   const [showAttendance, setShowAttendance] = useState(false);
   const [showLibrary, setShowLibrary] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     fetchStudents();
@@ -51,10 +53,43 @@ const ViewStudents = () => {
     }
   };
 
+  // Handle library record deletion
+  const handleDeleteLibraryRecord = async (studentId, bookName) => {
+    try {
+      await axios.delete(`http://localhost:5000/library-records/${studentId}/${bookName}`);
+      alert("Library record deleted successfully!");
+      viewDetails(studentId); // Refresh the student details
+    } catch (error) {
+      console.error("There was an error deleting the library record!", error);
+      alert("Error deleting library record");
+    }
+  };
+
+  // Handle search
+  const handleSearch = async () => {
+    try {
+      const response = await axios.get(`http://localhost:5000/students?search=${searchQuery}`);
+      setStudents(response.data);
+    } catch (err) {
+      setError("Failed to search students");
+    }
+  };
+
   return (
     <div className="view-students">
       <h2>Student List</h2>
       {error && <div className="error">{error}</div>}
+
+      {/* Search input and button */}
+      <div className="search-container">
+        <input
+          type="text"
+          placeholder="Search by name or ID"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <button onClick={handleSearch}>Search</button>
+      </div>
 
       <table className="student-table">
         <thead>
@@ -162,7 +197,7 @@ const ViewStudents = () => {
                         <th>Due Date</th>
                         <td>{record.due_date}</td>
                         <td>
-                          <button onClick={() => handleDeleteStudent(selectedStudent.student.id)}>
+                          <button onClick={() => handleDeleteLibraryRecord(selectedStudent.student.id, record.book_name)}>
                             Delete
                           </button>
                         </td>

@@ -1,0 +1,69 @@
+/* Navbar.css */
+.navbar {
+    background-color: #1a73e8; /* Primary background color */
+    color: #ffffff; /* Text color */
+    padding: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky; /* Navbar stays fixed at the top */
+    top: 0;
+    z-index: 1000;
+    transition: background-color 0.3s ease; /* Smooth background color change */
+  }
+  
+  .navbar:hover {
+    background-color: #1557b3; /* Darker blue on hover */
+  }
+  
+  .navbar-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+    animation: fadeIn 1s ease-in-out; /* Subtle fade-in animation */
+  }
+  
+  .nav-links {
+    display: flex;
+    gap: 1.5rem;
+  }
+  
+  .nav-link {
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 1rem;
+    position: relative;
+    overflow: hidden; /* For hover underline effect */
+    padding: 0.2rem 0;
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+  
+  .nav-link::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 2px;
+    background-color: #ffd700; /* Gold underline */
+    bottom: 0;
+    left: -100%;
+    transition: left 0.3s ease;
+  }
+  
+  .nav-link:hover {
+    color: #ffd700; /* Highlight color on hover */
+    transform: scale(1.1); /* Slight zoom-in effect */
+  }
+  
+  .nav-link:hover::after {
+    left: 0; /* Slide in underline */
+  }
+  
+  /* Keyframes for fade-in animation */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }

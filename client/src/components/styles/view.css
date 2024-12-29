@@ -1,0 +1,159 @@
+.view-students {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  .view-students h2 {
+    color: #333;
+    margin-bottom: 20px;
+    font-size: 24px;
+  }
+  
+  .view-students .error {
+    background-color: #ffe6e6;
+    color: #d63031;
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+  }
+  
+  .view-students .student-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  }
+  
+  .view-students .student-table th,
+  .view-students .student-table td {
+    padding: 12px 15px;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .view-students .student-table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+  }
+  
+  .view-students .student-table tr:hover {
+    background-color: #f5f5f5;
+  }
+  
+  .view-students .view-btn,
+  .view-students .delete-btn {
+    padding: 6px 12px;
+    margin: 0 5px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.2s;
+  }
+  
+  .view-students .view-btn {
+    background-color: #3498db;
+    color: white;
+  }
+  
+  .view-students .view-btn:hover {
+    background-color: #2980b9;
+  }
+  
+  .view-students .delete-btn {
+    background-color: #e74c3c;
+    color: white;
+  }
+  
+  .view-students .delete-btn:hover {
+    background-color: #c0392b;
+  }
+  
+  /* Modal Styles */
+  .view-students .modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .view-students .modal-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 800px;
+    max-height: 80vh;
+    overflow-y: auto;
+    width: 90%;
+  }
+  
+  .view-students .modal-content h3 {
+    color: #333;
+    margin-bottom: 20px;
+  }
+  
+  .view-students .modal-content h4 {
+    color: #444;
+    margin: 15px 0;
+  }
+  
+  .view-students .modal-content table {
+    width: 100%;
+    margin-bottom: 20px;
+    border-collapse: collapse;
+  }
+  
+  .view-students .modal-content th,
+  .view-students .modal-content td {
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    text-align: left;
+  }
+  
+  .view-students .modal-content th {
+    font-weight: 600;
+    color: #495057;
+    width: 30%;
+  }
+  
+  .view-students .modal-content button {
+    background-color: #3498db;
+    color: white;
+    padding: 8px 15px;
+    border: none;
+    border-radius: 4px;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .view-students .modal-content button:hover {
+    background-color: #2980b9;
+  }
+  
+  /* Responsive Design */
+  @media screen and (max-width: 768px) {
+    .view-students .student-table {
+      display: block;
+      overflow-x: auto;
+      white-space: nowrap;
+    }
+    
+    .view-students .modal-content {
+      width: 95%;
+      padding: 15px;
+    }
+    
+    .view-students .modal-content th,
+    .view-students .modal-content td {
+      padding: 8px;
+    }
+  }
