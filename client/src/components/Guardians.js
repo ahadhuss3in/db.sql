@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./styles/guardians.css"
 
 const Guardians = () => {
   const [formData, setFormData] = useState({
@@ -25,7 +26,7 @@ const Guardians = () => {
   };
 
   return (
-    <div className="guardians">
+    <div className="guardians-container">
       <h1>Guardians</h1>
       <form onSubmit={handleSubmit}>
         <input
