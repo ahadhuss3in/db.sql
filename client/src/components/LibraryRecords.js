@@ -7,7 +7,6 @@ const LibraryRecords = () => {
     student_id: "",
     book_name: "",
     issue_date: "",
-    due_date: "",
   });
 
   const [libraryRecords, setLibraryRecords] = useState([]);
@@ -24,7 +23,7 @@ const LibraryRecords = () => {
     setLoading(true);
     setError(null); // Reset error message
     try {
-      const response = await axios.get("http://localhost:5000/library-records/1"); // Use a specific student_id or remove :id to get all records
+      const response = await axios.get("http://localhost:5000/library-records");
       setLibraryRecords(response.data); // Set the data to state
       setLoading(false); // End loading state
     } catch (err) {
@@ -51,7 +50,6 @@ const LibraryRecords = () => {
         student_id: "",
         book_name: "",
         issue_date: "",
-        due_date: "",
       }); // Reset the form
     } catch (error) {
       console.error("Error adding record:", error);
@@ -106,21 +104,12 @@ const LibraryRecords = () => {
           onChange={handleChange}
           required
         />
-        <input
-          type="date"
-          name="due_date"
-          value={formData.due_date}
-          onChange={handleChange}
-          required
-        />
         <button type="submit">Add Record</button>
       </form>
 
-      {/* Displaying error or loading state */}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {loading && <p>Loading...</p>}
 
-  
+
+      
     </div>
   );
 };

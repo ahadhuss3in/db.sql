@@ -28,7 +28,8 @@ const Home = () => {
 
   return (
     <div className="home">
-      <h1>Add Student</h1>
+      <h1>Teacher Portal</h1>
+      <h3>Add student</h3>
       <form onSubmit={handleSubmit}>
         <input
           type="text"

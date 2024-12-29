@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import { format, isValid } from "date-fns";
 import "./styles/view.css";
 
 const ViewStudents = () => {
@@ -73,6 +74,12 @@ const ViewStudents = () => {
     } catch (err) {
       setError("Failed to search students");
     }
+  };
+
+  // Function to format date as YYYY-MM-DD
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return isValid(date) ? format(date, "yyyy-MM-dd") : "Invalid date";
   };
 
   return (
@@ -155,7 +162,7 @@ const ViewStudents = () => {
                 </tr>
                 <tr>
                   <th>Join Date</th>
-                  <td>{selectedStudent.studentInfo?.join_date}</td>
+                  <td>{formatDate(selectedStudent.studentInfo?.join_date)}</td>
                 </tr>
                 <tr>
                   <th>Fees</th>
@@ -193,9 +200,9 @@ const ViewStudents = () => {
                         <th>Book Name</th>
                         <td>{record.book_name}</td>
                         <th>Issue Date</th>
-                        <td>{record.issue_date}</td>
+                        <td>{formatDate(record.issue_date)}</td>
                         <th>Due Date</th>
-                        <td>{record.due_date}</td>
+                        <td>{formatDate(record.due_date)}</td>
                         <td>
                           <button onClick={() => handleDeleteLibraryRecord(selectedStudent.student.id, record.book_name)}>
                             Delete
@@ -217,7 +224,7 @@ const ViewStudents = () => {
                     {selectedStudent.attendanceRecords.map((attendance, index) => (
                       <tr key={index}>
                         <th>Date</th>
-                        <td>{attendance.date}</td>
+                        <td>{formatDate(attendance.date)}</td>
                         <th>Status</th>
                         <td>{attendance.status}</td>
                       </tr>

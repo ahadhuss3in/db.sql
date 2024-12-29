@@ -47,7 +47,9 @@ const AcademicRecords = () => {
   return (
     
     <div className="academic-records-container">
+      <h1>Academic Records</h1>
       <form onSubmit={handleSubmit}>
+
         <input
           type="text"
           name="student_id"
@@ -78,9 +80,7 @@ const AcademicRecords = () => {
         />
         <button type="submit">Add Record</button>
       </form>
-      <button onClick={handleShowRecords}>
-        {showRecords ? "Hide Records" : "Show Records"}
-      </button>
+      
       {showRecords && (
         <ul>
           {records.map((record) => (
