@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const { Pool } = require("pg");
+const { format, addDays } = require("date-fns");
 
 const app = express();
 app.use(cors());
@@ -13,6 +14,15 @@ const pool = new Pool({
   database: "student_db",
   password: "ahad",
   port: 5432,
+});
+
+// Test the database connection
+pool.connect((err, client, release) => {
+  if (err) {
+    return console.error('Error acquiring client', err.stack);
+  }
+  console.log('Connected to the database');
+  release();
 });
 
 // Routes
@@ -53,7 +63,8 @@ app.get("/students", async (req, res) => {
 app.delete('/students/:id', async (req, res) => {
   const studentId = req.params.id;
   try {
-    const result = await pool.query('DELETE FROM students WHERE id = $1', [studentId]);
+    await pool.query('BEGIN'); // Start transaction
+    const result = await pool.query('DELETE FROM students WHERE id = $1 RETURNING *', [studentId]);
 
     if (result.rowCount === 0) {
       await pool.query('ROLLBACK'); // Rollback if student not found
@@ -107,10 +118,28 @@ app.get("/student-details/:id", async (req, res) => {
   }
 });
 
+// Students GET route with filtering by grade and section
+// Students GET route with filtering by grade and section
+app.get("/studentss", async (req, res) => {
+  const { grade, section } = req.query;
+  try {
+    let query = "SELECT * FROM students WHERE grade = $1 AND section = $2";
+    const result = await pool.query(query, [grade, section]);
+
+    res.json(result.rows); // Return the list of students filtered by grade and section
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ message: "Failed to fetch students" });
+  }
+});
+
+
+
+
 // Attendance
 app.post("/attendance", async (req, res) => {
   const { student_id, status } = req.body;
-  const currentDate = new Date().toISOString().split("T")[0];
+  const currentDate = format(new Date(), "yyyy-MM-dd");
 
   try {
     const result = await pool.query(
@@ -203,40 +232,22 @@ app.get("/student-info/:id", async (req, res) => {
 
 // Library Records
 app.post("/library-records", async (req, res) => {
-  const { student_id, book_name, issue_date, due_date } = req.body;
+  const { student_id, book_name, issue_date } = req.body;
   try {
-    // Start a transaction
-    await pool.query("BEGIN");
+    // Calculate the due date as 10 days after the issue date
+    const issueDate = new Date(issue_date);
+    const dueDate = addDays(issueDate, 10);
 
     // Insert the new library record
     const result = await pool.query(
       "INSERT INTO library_records (student_id, book_name, issue_date, due_date) VALUES ($1, $2, $3, $4) RETURNING *",
-      [student_id, book_name, issue_date, due_date]
+      [student_id, book_name, issue_date, format(dueDate, "yyyy-MM-dd")]
     );
 
-    // Increase the student's fees by 30
-    const feeUpdateResult = await pool.query(
-      "UPDATE student_info SET fees = COALESCE(fees, 0) + 30 WHERE student_id = $1 RETURNING fees",
-      [student_id]
-    );
-
-    if (feeUpdateResult.rowCount === 0) {
-      throw new Error("Failed to update fees. Student record not found.");
-    }
-
-    // Commit the transaction
-    await pool.query("COMMIT");
-
-    // Return the updated library record and the new fees
-    res.json({
-      libraryRecord: result.rows[0],
-      updatedFees: feeUpdateResult.rows[0].fees,
-    });
+    res.json(result.rows[0]);
   } catch (err) {
-    // Rollback the transaction in case of error
-    await pool.query("ROLLBACK");
-    console.error("Error adding library record and updating fees:", err.message);
-    res.status(500).json({ message: "Failed to add library record and update fees", error: err.message });
+    console.error("Error adding library record:", err.message);
+    res.status(500).json({ message: "Failed to add library record", error: err.message });
   }
 });
 
